@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tareas — Familia Ampudia</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --azul: #185FA5; --azul-lt: #E6F1FB;
+  --verde: #3B6D11; --verde-lt: #EAF3DE;
+  --rojo: #E24B4A; --rojo-lt: #FCEBEB;
+  --amarillo: #BA7517; --amar-lt: #FAEEDA;
+  --gris: #888780; --gris-lt: #F1EFE8;
+  --texto: #2C2C2A; --texto2: #5F5E5A;
+  --borde: rgba(0,0,0,0.12);
+  --fondo: #F7F6F3; --blanco: #ffffff;
+  --radio: 12px; --radio-sm: 8px;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--fondo); color: var(--texto); min-height: 100vh; padding-bottom: 2rem; }
+.header { background: var(--azul); padding: 1.2rem 1rem 0.8rem; text-align: center; position: sticky; top: 0; z-index: 100; }
+.header h1 { color: white; font-size: 18px; font-weight: 700; }
+.header .fecha { color: rgba(255,255,255,0.75); font-size: 11px; margin-top: 2px; }
+.hijo-tabs { display: flex; background: var(--azul); padding: 0 1rem 0.75rem; gap: 6px; }
+.hijo-btn { flex: 1; padding: 8px 4px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
+.hijo-btn.active { background: white; color: var(--azul); border-color: white; }
+.progress-wrap { background: var(--azul); padding: 0 1rem 0.9rem; }
+.progress-bar { height: 5px; background: rgba(255,255,255,0.25); border-radius: 3px; }
+.progress-fill { height: 100%; border-radius: 3px; background: white; transition: width 0.4s ease; }
+.progress-stats { display: flex; justify-content: space-between; margin-top: 5px; }
+.progress-stats span { color: rgba(255,255,255,0.8); font-size: 11px; }
+.sync-bar { display: flex; align-items: center; gap: 8px; padding: 0.6rem 1rem; background: var(--blanco); border-bottom: 1px solid var(--borde); }
+.sync-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--azul); background: var(--azul-lt); font-size: 12px; font-weight: 600; color: var(--azul); cursor: pointer; flex-shrink: 0; }
+.sync-status { font-size: 12px; color: var(--texto2); flex: 1; }
+.config-toggle { font-size: 12px; color: var(--azul); cursor: pointer; text-decoration: underline; flex-shrink: 0; }
+.config-section { padding: 0.75rem 1rem; background: var(--blanco); border-bottom: 1px solid var(--borde); display: none; }
+.config-label { font-size: 11px; color: var(--texto2); margin-bottom: 3px; margin-top: 8px; }
+.config-section input { width: 100%; padding: 8px 10px; border-radius: var(--radio-sm); border: 1px solid var(--borde); background: var(--fondo); font-size: 12px; color: var(--texto); outline: none; font-family: monospace; }
+.config-section input:focus { border-color: var(--azul); }
+.save-btn { margin-top: 10px; width: 100%; padding: 9px; border-radius: var(--radio-sm); border: none; background: var(--azul); color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
+.day-row { display: flex; gap: 6px; padding: 0.6rem 1rem; overflow-x: auto; scrollbar-width: none; background: var(--blanco); border-bottom: 1px solid var(--borde); }
+.day-row::-webkit-scrollbar { display: none; }
+.day-btn { flex-shrink: 0; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--borde); background: var(--gris-lt); font-size: 12px; font-weight: 500; color: var(--texto2); cursor: pointer; }
+.day-btn.active { background: var(--azul); color: white; border-color: var(--azul); }
+.badge { display: inline-block; background: var(--rojo); color: white; border-radius: 10px; font-size: 10px; padding: 1px 5px; margin-left: 4px; }
+.add-section { padding: 0.85rem 1rem 0; background: var(--blanco); border-bottom: 1px solid var(--borde); }
+.add-row-1 { display: flex; gap: 8px; margin-bottom: 8px; }
+.add-row-1 input { flex: 1; padding: 10px 12px; border-radius: var(--radio-sm); border: 1px solid var(--borde); background: var(--fondo); font-size: 15px; color: var(--texto); outline: none; }
+.add-row-1 input:focus { border-color: var(--azul); background: white; }
+.btn-add { width: 44px; height: 44px; border-radius: var(--radio-sm); border: none; background: var(--azul); color: white; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.add-row-2 { display: flex; gap: 6px; margin-bottom: 8px; }
+.materia-select, .dia-select { flex: 1; padding: 8px 10px; border-radius: var(--radio-sm); border: 1px solid var(--borde); background: var(--fondo); font-size: 13px; color: var(--texto); outline: none; }
+.urgencia-btns { display: flex; gap: 6px; margin-bottom: 10px; }
+.urg-btn { flex: 1; padding: 7px 4px; border-radius: var(--radio-sm); border: 1.5px solid transparent; font-size: 12px; font-weight: 500; cursor: pointer; text-align: center; }
+.urg-btn.roja { background: var(--rojo-lt); border-color: var(--rojo); color: #7a1f1f; }
+.urg-btn.amarilla { background: var(--amar-lt); border-color: var(--amarillo); color: #5a3000; }
+.urg-btn.verde { background: var(--verde-lt); border-color: var(--verde); color: #1f4008; }
+.urg-btn.selected { box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor; font-weight: 700; }
+.tasks { padding: 0.75rem 1rem; }
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--texto2); }
+.empty-state .icon { font-size: 48px; margin-bottom: 0.5rem; }
+.empty-state p { font-size: 14px; }
+.task-card { display: flex; align-items: flex-start; gap: 10px; background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 11px 12px; margin-bottom: 8px; transition: opacity .2s; }
+.task-card.done { opacity: 0.45; }
+.check-btn { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--borde); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-size: 14px; }
+.check-btn.done { background: var(--verde); border-color: var(--verde); color: white; }
+.task-body { flex: 1; min-width: 0; }
+.task-text { font-size: 14px; color: var(--texto); line-height: 1.4; word-break: break-word; }
+.task-card.done .task-text { text-decoration: line-through; color: var(--gris); }
+.task-meta { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+.materia-pill { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.urg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dia-tag { font-size: 10px; color: var(--texto2); background: var(--gris-lt); padding: 2px 6px; border-radius: 6px; }
+.del-btn { background: transparent; border: none; cursor: pointer; color: var(--gris); font-size: 20px; padding: 2px 4px; flex-shrink: 0; line-height: 1; }
+.congrats { text-align: center; background: var(--verde-lt); border: 1px solid var(--verde); border-radius: var(--radio); padding: 1rem; margin: 0 1rem 1rem; display: none; }
+.congrats.show { display: block; }
+.congrats p { color: var(--verde); font-weight: 600; font-size: 15px; }
+.star-pop { position: fixed; top: 45%; left: 50%; transform: translate(-50%,-50%) scale(0.5); font-size: 64px; pointer-events: none; z-index: 9999; animation: starAnim 0.9s ease-out forwards; }
+@keyframes starAnim { 0%{opacity:1;transform:translate(-50%,-50%) scale(0.5);}40%{opacity:1;transform:translate(-50%,-50%) scale(1.4);}100%{opacity:0;transform:translate(-50%,-80%) scale(1.1);} }
+.legend { margin: 0 1rem; background: var(--blanco); border: 1px solid var(--borde); border-radius: var(--radio); padding: 0.75rem 1rem; }
+.legend h3 { font-size: 12px; color: var(--texto2); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.legend-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+.legend-item { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Tareas — Familia Ampudia</h1>
+  <div class="fecha" id="fechaHoy"></div>
+</div>
+
+<div class="hijo-tabs">
+  <button class="hijo-btn active" onclick="switchHijo(0)">🐱 Rebeca</button>
+  <button class="hijo-btn" onclick="switchHijo(1)">🐭 Ezequiel</button>
+  <button class="hijo-btn" onclick="switchHijo(2)">🐸 Alba</button>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+  <div class="progress-stats"><span id="statPend">0 pendientes</span><span id="statDone">0 listas</span></div>
+</div>
+
+<div class="sync-bar">
+  <button class="sync-btn" onclick="syncSheets()">↻ Sincronizar</button>
+  <span class="sync-status" id="syncStatus">Listo</span>
+  <span class="config-toggle" onclick="toggleConfig()">⚙ Config</span>
+</div>
+
+<div class="config-section" id="configSection">
+  <div class="config-label">ID de Google Sheets (de la URL)</div>
+  <input type="text" id="sheetId" placeholder="13WBi5crVthbOSGNnT3Q4PKvowpQZFUL_cBsRxoywEHg" value="13WBi5crVthbOSGNnT3Q4PKvowpQZFUL_cBsRxoywEHg" />
+  <div class="config-label" style="color:#888;font-style:italic;">La hoja debe estar compartida como "Cualquier persona con el enlace - Lector"</div>
+  <button class="save-btn" onclick="saveConfig()">Guardar</button>
+</div>
+
+<div class="day-row" id="dayRow"></div>
+
+<div class="add-section">
+  <div class="add-row-1">
+    <input type="text" id="taskInput" placeholder="Agregar tarea..." maxlength="120" autocomplete="off" />
+    <button class="btn-add" onclick="addTask()">+</button>
+  </div>
+  <div class="add-row-2">
+    <select class="materia-select" id="materiaSelect"></select>
+    <select class="dia-select" id="diaSelect">
+      <option>Lunes</option><option>Martes</option><option>Miércoles</option>
+      <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
+    </select>
+  </div>
+  <div class="urgencia-btns">
+    <button class="urg-btn roja" onclick="setUrg('roja',this)">Urgente</button>
+    <button class="urg-btn amarilla" onclick="setUrg('amarilla',this)">Esta semana</button>
+    <button class="urg-btn verde selected" onclick="setUrg('verde',this)">Sin prisa</button>
+  </div>
+</div>
+
+<div id="congrats" class="congrats"><p id="congratsMsg"></p></div>
+<div class="tasks" id="taskList"></div>
+<div class="legend"><h3>Materias</h3><div class="legend-grid" id="legendGrid"></div></div>
+
+<script>
+var DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+var URG_COLORS = { roja:'#E24B4A', amarilla:'#BA7517', verde:'#3B6D11' };
+var HIJOS = [
+  { nombre:'Rebeca', emoji:'🐱', materias:[
+    {name:'Educación Física',bg:'#F1EFE8',fg:'#444441'},{name:'Estudios Sociales',bg:'#FAEEDA',fg:'#633806'},
+    {name:'Lengua y Literatura',bg:'#F4C0D1',fg:'#72243E'},{name:'Matemáticas',bg:'#E6F1FB',fg:'#0C447C'},
+    {name:'Inglés',bg:'#EEEDFE',fg:'#3C3489'},{name:'Ciencias Naturales',bg:'#EAF3DE',fg:'#27500A'},
+    {name:'Educación Financiera',bg:'#E1F5EE',fg:'#085041'},{name:'Orientación',bg:'#FAECE7',fg:'#711B13'},
+    {name:'Educación Cultural y Artística',bg:'#F4C0D1',fg:'#4B1528'},{name:'Robótica',bg:'#B5D4F4',fg:'#042C53'}
+  ]},
+  { nombre:'Ezequiel', emoji:'🐭', materias:[
+    {name:'Lengua y Literatura',bg:'#F4C0D1',fg:'#72243E'},{name:'Estudios Sociales',bg:'#FAEEDA',fg:'#633806'},
+    {name:'Ciencias Naturales',bg:'#EAF3DE',fg:'#27500A'},{name:'Matemáticas',bg:'#E6F1FB',fg:'#0C447C'},
+    {name:'Educación Financiera',bg:'#E1F5EE',fg:'#085041'},{name:'Inglés',bg:'#EEEDFE',fg:'#3C3489'},
+    {name:'ECA',bg:'#FAECE7',fg:'#711B13'},{name:'Educación Física',bg:'#F1EFE8',fg:'#444441'},
+    {name:'Robótica',bg:'#B5D4F4',fg:'#042C53'}
+  ]},
+  { nombre:'Alba', emoji:'🐸', materias:[
+    {name:'Ciencias Naturales',bg:'#EAF3DE',fg:'#27500A'},{name:'Matemáticas',bg:'#E6F1FB',fg:'#0C447C'},
+    {name:'Lengua y Literatura',bg:'#F4C0D1',fg:'#72243E'},{name:'Inglés',bg:'#EEEDFE',fg:'#3C3489'},
+    {name:'Educación Física',bg:'#F1EFE8',fg:'#444441'},{name:'Educación Financiera',bg:'#E1F5EE',fg:'#085041'},
+    {name:'Acompañamiento',bg:'#FAEEDA',fg:'#633806'},{name:'Estudios Sociales',bg:'#FAC775',fg:'#412402'},
+    {name:'ECA',bg:'#FAECE7',fg:'#711B13'},{name:'Robótica',bg:'#B5D4F4',fg:'#042C53'}
+  ]}
+];
+
+var tasks = {}, currentHijo = 0, currentDay = (function(){ var d=new Date().getDay(); return d===0?6:d-1; })(), selectedUrg = 'verde';
+try { tasks = JSON.parse(localStorage.getItem('familia_v3')||'{}'); } catch(e){ tasks={}; }
+function save(){ try{ localStorage.setItem('familia_v3', JSON.stringify(tasks)); }catch(e){} }
+
+var SHEET_ID = '13WBi5crVthbOSGNnT3Q4PKvowpQZFUL_cBsRxoywEHg';
+
+function getConfig(){ try{ return JSON.parse(localStorage.getItem('sheets_cfg3')||'{}'); }catch(e){ return {}; } }
+function saveConfig(){
+  var id = document.getElementById('sheetId').value.trim();
+  SHEET_ID = id;
+  localStorage.setItem('sheets_cfg3', JSON.stringify({sheetId:id}));
+  toggleConfig();
+  syncSheets();
+}
+function toggleConfig(){
+  var s = document.getElementById('configSection');
+  s.style.display = s.style.display==='none'?'block':'none';
+  var cfg = getConfig();
+  document.getElementById('sheetId').value = cfg.sheetId || SHEET_ID;
+}
+
+async function syncSheets(){
+  var cfg = getConfig();
+  var sheetId = cfg.sheetId || SHEET_ID;
+  document.getElementById('syncStatus').textContent='Sincronizando...';
+  try {
+    var url = 'https://docs.google.com/spreadsheets/d/'+sheetId+'/gviz/tq?tqx=out:csv&sheet=Hoja1';
+    var res = await fetch(url);
+    if(!res.ok){ document.getElementById('syncStatus').textContent='Error '+res.status; return; }
+    var csv = await res.text();
+    var rows = csv.trim().split('\n').slice(1);
+    var synced = 0;
+    rows.forEach(function(row, idx){
+      var cols = [];
+      var cur = '', inQ = false;
+      for(var i=0;i<row.length;i++){
+        if(row[i]==='"'){ inQ=!inQ; }
+        else if(row[i]===','&&!inQ){ cols.push(cur.trim()); cur=''; }
+        else { cur+=row[i]; }
+      }
+      cols.push(cur.trim());
+      var hijo=cols[0]||'', materia=cols[1]||'', tarea=cols[2]||'', urgencia=(cols[3]||'verde').toLowerCase(), dia=cols[4]||'Lunes', hecho=(cols[5]||'').toLowerCase()==='si';
+      if(!hijo||!tarea) return;
+      var hijoIdx = HIJOS.findIndex(function(h){ return h.nombre.toLowerCase()===hijo.toLowerCase(); });
+      if(hijoIdx===-1) return;
+      var diaIdx = DIAS.findIndex(function(d){ return d.toLowerCase()===dia.toLowerCase(); });
+      if(diaIdx===-1) diaIdx=0;
+      var key = hijoIdx+'_'+diaIdx;
+      if(!tasks[key]) tasks[key]=[];
+      var rowId='sr_'+idx;
+      if(!tasks[key].find(function(t){ return t.sheetRowId===rowId; })){
+        tasks[key].push({text:tarea,materia:materia,urgencia:urgencia,done:hecho,id:Date.now()+idx,sheetRowId:rowId,dia:DIAS[diaIdx]});
+        synced++;
+      }
+    });
+    save();
+    document.getElementById('syncStatus').textContent = synced>0 ? synced+' tareas importadas ✓' : 'Al día ✓';
+    renderTasks(); renderDayBadges();
+  } catch(e){
+    document.getElementById('syncStatus').textContent='Error: '+e.message;
+  }
+}
+
+function matColor(hi,name){ var m=HIJOS[hi].materias.find(function(x){ return x.name===name; }); return m?[m.bg,m.fg]:['#F1EFE8','#444441']; }
+function setUrg(u,btn){ selectedUrg=u; document.querySelectorAll('.urg-btn').forEach(function(b){ b.classList.remove('selected'); }); btn.classList.add('selected'); }
+function switchHijo(idx){ currentHijo=idx; document.querySelectorAll('.hijo-btn').forEach(function(b,i){ b.classList.toggle('active',i===idx); }); renderMaterias(); renderDayBadges(); renderTasks(); renderLegend(); }
+function renderMaterias(){ var s=document.getElementById('materiaSelect'); s.innerHTML=''; HIJOS[currentHijo].materias.forEach(function(m){ var o=document.createElement('option'); o.value=m.name; o.textContent=m.name; s.appendChild(o); }); }
+function addTask(){
+  var inp=document.getElementById('taskInput'), mat=document.getElementById('materiaSelect').value, diaStr=document.getElementById('diaSelect').value, text=inp.value.trim();
+  if(!text){ inp.focus(); return; }
+  var diaIdx=DIAS.indexOf(diaStr); if(diaIdx===-1) diaIdx=currentDay;
+  var key=currentHijo+'_'+diaIdx;
+  if(!tasks[key]) tasks[key]=[];
+  tasks[key].unshift({text:text,materia:mat,urgencia:selectedUrg,done:false,id:Date.now(),dia:DIAS[diaIdx]});
+  save(); inp.value=''; renderTasks(); renderDayBadges();
+}
+function toggleDone(id){ var key=currentHijo+'_'+currentDay, list=tasks[key]||[]; for(var i=0;i<list.length;i++){ if(list[i].id===id){ list[i].done=!list[i].done; if(list[i].done) showStar(); break; } } save(); renderTasks(); renderDayBadges(); }
+function deleteTask(id){ var key=currentHijo+'_'+currentDay; if(!tasks[key]) return; tasks[key]=tasks[key].filter(function(t){ return t.id!==id; }); save(); renderTasks(); renderDayBadges(); }
+function showStar(){ var el=document.createElement('div'); el.className='star-pop'; el.textContent='⭐'; document.body.appendChild(el); setTimeout(function(){ el.remove(); },950); }
+function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function countPending(hi,di){ return (tasks[hi+'_'+di]||[]).filter(function(t){ return !t.done; }).length; }
+function renderDayBadges(){ document.querySelectorAll('.day-btn').forEach(function(btn,i){ var old=btn.querySelector('.badge'); if(old) old.remove(); var p=countPending(currentHijo,i); if(p>0){ var b=document.createElement('span'); b.className='badge'; b.textContent=p; btn.appendChild(b); } }); }
+function renderTasks(){
+  var key=currentHijo+'_'+currentDay, list=tasks[key]||[];
+  var done=list.filter(function(t){ return t.done; }).length, total=list.length;
+  document.getElementById('progFill').style.width=(total?Math.round(done/total*100):0)+'%';
+  document.getElementById('statPend').textContent=(total-done)+' pendiente'+((total-done)!==1?'s':'');
+  document.getElementById('statDone').textContent=done+' lista'+(done!==1?'s':'')+' ✓';
+  var cg=document.getElementById('congrats');
+  if(total>0&&done===total){ cg.classList.add('show'); document.getElementById('congratsMsg').textContent='¡Todas completadas! '+HIJOS[currentHijo].emoji+' ¡Excelente, '+HIJOS[currentHijo].nombre+'!'; }
+  else cg.classList.remove('show');
+  var c=document.getElementById('taskList');
+  if(!list.length){ c.innerHTML='<div class="empty-state"><div class="icon">'+HIJOS[currentHijo].emoji+'</div><p>Sin tareas este día.<br>Sincroniza o agrega una arriba.</p></div>'; return; }
+  c.innerHTML='';
+  list.forEach(function(t){
+    var col=matColor(currentHijo,t.materia), card=document.createElement('div');
+    card.className='task-card'+(t.done?' done':'');
+    card.innerHTML='<button class="check-btn '+(t.done?'done':'')+'" onclick="toggleDone('+t.id+')">'+(t.done?'✓':'')+'</button>'+
+      '<div class="task-body"><div class="task-text">'+escHtml(t.text)+'</div>'+
+      '<div class="task-meta"><span class="materia-pill" style="background:'+col[0]+';color:'+col[1]+'">'+escHtml(t.materia)+'</span>'+
+      '<span class="urg-dot" style="background:'+(URG_COLORS[t.urgencia||'verde'])+'"></span>'+
+      (t.dia?'<span class="dia-tag">'+escHtml(t.dia)+'</span>':'')+
+      '</div></div><button class="del-btn" onclick="deleteTask('+t.id+')">×</button>';
+    c.appendChild(card);
+  });
+}
+function renderLegend(){ var g=document.getElementById('legendGrid'); g.innerHTML=''; HIJOS[currentHijo].materias.forEach(function(m){ var el=document.createElement('span'); el.className='legend-item'; el.style.background=m.bg; el.style.color=m.fg; el.textContent=m.name; g.appendChild(el); }); }
+function initDays(){ var row=document.getElementById('dayRow'); DIAS.forEach(function(dia,idx){ var btn=document.createElement('button'); btn.className='day-btn'+(idx===currentDay?' active':''); btn.textContent=dia; btn.onclick=function(){ currentDay=idx; document.querySelectorAll('.day-btn').forEach(function(b,j){ b.classList.toggle('active',j===idx); }); renderTasks(); }; row.appendChild(btn); }); }
+
+document.getElementById('fechaHoy').textContent=new Date().toLocaleDateString('es-EC',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+initDays(); renderMaterias(); renderLegend(); renderTasks();
+document.getElementById('taskInput').addEventListener('keydown',function(e){ if(e.key==='Enter') addTask(); });
+setTimeout(syncSheets, 800);
+</script>
+</body>
+</html>
