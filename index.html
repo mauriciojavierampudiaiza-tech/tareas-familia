@@ -243,6 +243,7 @@ function addTask(){
   save(); inp.value=''; renderTasks(); renderDayBadges();
 }
 function toggleDone(id){ var key=currentHijo+'_'+currentDay, list=tasks[key]||[]; for(var i=0;i<list.length;i++){ if(list[i].id===id){ list[i].done=!list[i].done; if(list[i].done) showStar(); break; } } save(); renderTasks(); renderDayBadges(); }
+function cycleUrg(id){ var key=currentHijo+'_'+currentDay, list=tasks[key]||[], cycle={roja:'amarilla',amarilla:'verde',verde:'roja'}; for(var i=0;i<list.length;i++){ if(list[i].id===id){ list[i].urgencia=cycle[list[i].urgencia||'verde']; break; } } save(); renderTasks(); }
 function deleteTask(id){ var key=currentHijo+'_'+currentDay; if(!tasks[key]) return; tasks[key]=tasks[key].filter(function(t){ return t.id!==id; }); save(); renderTasks(); renderDayBadges(); }
 function showStar(){ var el=document.createElement('div'); el.className='star-pop'; el.textContent='⭐'; document.body.appendChild(el); setTimeout(function(){ el.remove(); },950); }
 function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -266,7 +267,7 @@ function renderTasks(){
     card.innerHTML='<button class="check-btn '+(t.done?'done':'')+'" onclick="toggleDone('+t.id+')">'+(t.done?'✓':'')+'</button>'+
       '<div class="task-body"><div class="task-text">'+escHtml(t.text)+'</div>'+
       '<div class="task-meta"><span class="materia-pill" style="background:'+col[0]+';color:'+col[1]+'">'+escHtml(t.materia)+'</span>'+
-      '<span class="urg-dot" style="background:'+(URG_COLORS[t.urgencia||'verde'])+'"></span>'+
+      '<span class="urg-dot" style="background:'+(URG_COLORS[t.urgencia||'verde'\'])+\';cursor:pointer;width:12px;height:12px;" onclick="cycleUrg('+t.id+')" title="Cambiar urgencia"></span>\'+
       (t.dia?'<span class="dia-tag">'+escHtml(t.dia)+'</span>':'')+
       '</div></div><button class="del-btn" onclick="deleteTask('+t.id+')">×</button>';
     c.appendChild(card);
