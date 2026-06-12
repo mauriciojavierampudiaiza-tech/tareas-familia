@@ -449,6 +449,7 @@ renderLegend();
 renderTasks();
 document.getElementById('taskInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') addTask(); });
 setTimeout(syncSheets, 800);
+setInterval(syncSheets, 15 * 60 * 1000);
 </script>
 </body>
 </html>
